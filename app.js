@@ -1,9 +1,20 @@
 const express = require('express');
+const cors = require('cors');
+const allowedOrigins = require('./allowedOrigins');
+
+const corsOpts = {
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET','POST','HEAD','PUT','PATCH','DELETE'],
+    allowedHeaders: ['Content-Type'],
+    exposedHeaders: ['Content-Type']
+};
 
 async function startServer() {
     // express app
     const app = express();
     app.set('view engine', 'ejs');
+    app.use(cors(corsOpts));
     app.use(express.urlencoded({ limit: "5mb", extended: true, parameterLimit: 10 }));
     app.use(express.json());
 
