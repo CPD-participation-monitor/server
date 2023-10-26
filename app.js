@@ -23,6 +23,7 @@ async function startServer() {
 
     // routes for any user (login not required)
     app.use('/', require('./routes/login'));
+    app.use('/', require('./routes/signup'));
 
     // serve
     const PORT = process.env.PORT || 8080;
