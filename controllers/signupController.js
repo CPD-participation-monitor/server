@@ -1,6 +1,6 @@
 const Validator = require("../utils/validator");
 
-const loginUser = async (req, res) => {
+const signupUser = async (req, res) => {
     try {
         const { email, password, name } = req.body;
         if (!email) {
@@ -35,4 +35,4 @@ const loginUser = async (req, res) => {
     }
 };
 
-module.exports = { loginUser };
+module.exports = { signupUser };
