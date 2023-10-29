@@ -2,7 +2,7 @@ const Validator = require("../utils/validator");
 const con = require("../utils/dbConnector");
 const bcrypt = require("bcrypt");
 
-const signupUser = async (req, res) => {
+const signupUser = (req, res) => {
     try {
         const { email, password, name } = req.body;
         if (!email) {
@@ -36,13 +36,12 @@ const signupUser = async (req, res) => {
                 res.status(409).json({ 'success': false, 'reason': 'Email already used' });
                 return;
             }
-            const pwHash = await bcrypt.hash(password, 12);
+            const pwHash = bcrypt.hashSync(password, 12);
             con.query("INSERT INTO user (email, password, name) VALUES (?, ?, ?)", [email, pwHash, name], function (err, result) {
                 if (err) throw err;
                 res.status(200).json({ 'success': true });
             });
         });
-        // TODO: Save the user in DB
     } catch (err) {
         console.log(err);
         res.status(500).json({ 'success': false, 'reason': 'Error occured' });

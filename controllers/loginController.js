@@ -1,4 +1,6 @@
 const Validator = require("../utils/validator");
+const con = require("../utils/dbConnector");
+const bcrypt = require("bcrypt");
 
 const loginUser = async (req, res) => {
     try {
@@ -19,12 +21,20 @@ const loginUser = async (req, res) => {
             res.status(400).json({ 'success': false, 'reason': 'Invalid password format' });
             return;
         }
-        // TODO: Change this to check password and issue JWT
-        if (email === password) {
-            res.status(200).json({ 'success': true });
-        } else {
+        con.query("SELECT password, name FROM user WHERE email = ?", [email], async function (err, result) {
+            if (err) throw err;
+            if (result.length !== 1) {
+                res.status(401).json({ 'success': false, 'reason': 'No such user' });
+                return;
+            }
+            const pwHash = result[0]['password'];
+            if (bcrypt.compareSync(password, pwHash)) {
+                const name = result[0]['name'];
+                res.status(200).json({ 'success': true, 'name': name });
+                return;
+            }
             res.status(401).json({ 'success': false, 'reason': 'Incorrect password' });
-        }
+        });
     } catch (err) {
         console.log(err);
         res.status(500).json({ 'success': false, 'reason': 'Error occured' });

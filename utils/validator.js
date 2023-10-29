@@ -3,14 +3,14 @@ class Validator {
     // maximum length for the fields
     static _lengthLimit = {
         email: 40,
-        password: 20,
+        password: 40,
         name: 30
     }
 
     // regex patterns for the fields
     static _patterns = {
         email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        password: /^[\x21-\x7E]{8,20}$/,
+        password: /^[\x21-\x7E]{8,40}$/,
         name: /^[A-Za-z\s]{2,30}$/
     };
 
