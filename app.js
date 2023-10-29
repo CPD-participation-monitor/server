@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const allowedOrigins = require('./allowedOrigins');
 
+require("dotenv").config({ path: "./.env" });
+
 const corsOpts = {
     origin: allowedOrigins,
     credentials: true,
