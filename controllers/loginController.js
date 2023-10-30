@@ -1,6 +1,11 @@
 const Validator = require("../utils/validator");
 const con = require("../utils/dbConnector");
 const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+const { serialize } = require('cookie');
+
+const KEY = process.env.JWT_SECRET;
+if (!KEY) throw new Error("JWT_SECRET not specified");
 
 const loginUser = async (req, res) => {
     try {
@@ -30,6 +35,17 @@ const loginUser = async (req, res) => {
             const pwHash = result[0]['password'];
             if (bcrypt.compareSync(password, pwHash)) {
                 const name = result[0]['name'];
+                const token = jwt.sign({ "email": email }, KEY, {
+                    expiresIn: "6h",
+                });
+                const serialized = serialize('token', token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production',
+                    sameSite: 'strict',
+                    maxAge: 60 * 60 * 6, // 6 hours
+                    path: '/',
+                });
+                res.setHeader('Set-Cookie', serialized);
                 res.status(200).json({ 'success': true, 'name': name });
                 return;
             }
