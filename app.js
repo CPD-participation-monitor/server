@@ -1,4 +1,5 @@
 const express = require('express');
+const mysql = require('mysql');
 
 async function startServer() {
     // express app
@@ -18,4 +19,24 @@ async function startServer() {
     app.listen(PORT, console.log("Server has started at port " + PORT));
 }
 
+var mysqlConnection = null;
+
+async function startMySQL() {
+
+    mysqlConnection = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "root"
+    });
+      
+    mysqlConnection.connect(function(err) {
+        if (err) throw err;
+        console.log("Connected to mysql server as root");
+    });
+
+}
+
 startServer();
+startMySQL();
+
+module.exports = {mysqlConnection}
