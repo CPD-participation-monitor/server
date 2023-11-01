@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const User = require("../models/user").User;
 
 let dbHost = process.env.MYSQL_HOST;
 if (!dbHost) throw new Error("DB host not specified");
@@ -18,5 +19,14 @@ const con = mysql.createConnection({
 
 if (!con) throw new Error("DB connection failed");
 console.log("Connected to database");
+
+function dbInit(){
+
+    con.query("DROP TABLE IF EXISTS users;");
+    con.query("CREATE TABLE IF NOT EXISTS users (username VARCHAR(255) PRIMARY KEY, email VARCHAR(255), password VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
+    const user1 = new User(con, "admin", "admin@localhost", "admin");
+}
+
+dbInit();
 
 module.exports = con;

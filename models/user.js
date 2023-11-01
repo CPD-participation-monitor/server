@@ -1,24 +1,24 @@
-const connection = require("../app.js").mysqlConnection;
+
 
 class User {
-    constructor (username, email, password) {
+    constructor (con, username, email, password) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.create(con);
     }
 
-    create(newUser, result) {
-        connection.query('INSERT INTO users SET ?', newUser, (err, res) => {
+    create(con) {
+        con.query('INSERT INTO users SET ?', this, (err, res) => {
             if (err) {
                 console.log('error: ', err);
                 result(err, null);
                 return;
             }
     
-            console.log('created user: ', { id: res.insertId, ...newUser });
-            result(null, { id: res.insertId, ...newUser });
+            console.log('created user: ', this);
         });
     };
 }
 
-module.exports = User;
+module.exports = {User};
