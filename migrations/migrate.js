@@ -37,6 +37,7 @@ async function migrate() {
     await db.query("INSERT INTO role (id, type) VALUES (2044, 'eng');");
     await db.query("INSERT INTO role (id, type) VALUES (6445, 'orgAdmin');");
     await db.query("INSERT INTO role (id, type) VALUES (3112, 'superAdmin');");
+    await db.query("INSERT INTO role (id, type) VALUES (1344, 'systemAdmin');");
 
     await db.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(60) PRIMARY KEY, password VARCHAR(100) NOT NULL, name VARCHAR(100) NOT NULL, nic VARCHAR(20), role INTEGER);");
     let pw = bcrypt.hashSync("engpass", 12);
