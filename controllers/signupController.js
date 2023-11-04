@@ -1,6 +1,6 @@
 const Validator = require("../utils/validator");
 const con = require("../utils/dbConnector");
-const bcrypt = require("bcrypt");
+const User = require("../models/user").User;
 
 const signupUser = (req, res) => {
     try {
@@ -29,19 +29,9 @@ const signupUser = (req, res) => {
             res.status(400).json({ 'success': false, 'reason': 'Invalid name format' });
             return;
         }
-        con.query("SELECT count(*) FROM user WHERE email = ?", [email], async function (err, result) {
-            if (err) throw err;
-            let count = result[0]['count(*)'];
-            if (count !== 0) {
-                res.status(409).json({ 'success': false, 'reason': 'Email already used' });
-                return;
-            }
-            const pwHash = bcrypt.hashSync(password, 12);
-            con.query("INSERT INTO user (email, password, name) VALUES (?, ?, ?)", [email, pwHash, name], function (err, result) {
-                if (err) throw err;
-                res.status(200).json({ 'success': true });
-            });
-        });
+        
+        const user = new User(con, res, req.body);
+
     } catch (err) {
         console.log(err);
         res.status(500).json({ 'success': false, 'reason': 'Error occured' });
