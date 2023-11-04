@@ -21,13 +21,13 @@ const getUserSession = () => {
 }
 
 const getUserAllSessions = (email, cb) => {
-    con.query('SELECT name, organization, date, hmac FROM user_session INNER JOIN session USING (sessionId) where email = ?', [email], function (err, result) {
+    con.query('SELECT name, org, date, hmac FROM user_session INNER JOIN session USING (sessionId) where email = ?', [email], function (err, result) {
         if (err) throw err;
         let sessions = [];
         for (const item of result) {
             const name = item.name;
-            const organization = item.organization;
-            const date = item.organization;
+            const organization = item.org;
+            const date = item.date;
             const hmac = item.hmac;
             const hmacCreator = createHmac('sha256', KEY);
             hmacCreator.update(`${email}|${name}|${organization}|${date}`, 'utf8');
