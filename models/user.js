@@ -26,9 +26,13 @@ class User {
 
             let roleInt = 0;
             if (data.role === "eng") {
-                roleInt = 1;
+                roleInt = 2044;
             } else if (data.role === "orgAdmin") {
-                roleInt = 2;
+                roleInt = 6445;
+            } else if (data.role === "superAdmin") {
+                roleInt = 3112;
+            } else if (data.role === "systemAdmin") {
+                roleInt = 1344;
             }
 
             con.query("INSERT INTO user (email, password, name, nic, role) VALUES (?, ?, ?, ?, ?)", [data.email, pwHash, data.name, data.nic, roleInt], function (err, result) {
