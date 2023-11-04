@@ -20,20 +20,4 @@ const con = mysql.createConnection({
 if (!con) throw new Error("DB connection failed");
 console.log("Connected to database");
 
-// Remove later
-function dbInit() {
-    con.query("DROP TABLE IF EXISTS role;");
-    con.query("CREATE TABLE IF NOT EXISTS role (id int PRIMARY KEY, type VARCHAR(255));");
-    con.query("INSERT INTO role (id, type) VALUES (2044, 'eng');");
-    con.query("INSERT INTO role (id, type) VALUES (6445, 'orgAdmin');");
-    con.query("INSERT INTO role (id, type) VALUES (3112, 'superAdmin');");
-
-    con.query("DROP TABLE IF EXISTS user;");
-    con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(255) PRIMARY KEY, password VARCHAR(255), name VARCHAR(255), nic VARCHAR(255), role int);");
-    const user1 = new User(con, null, {email: "eng@localhost.com", password: "engpass", name: "eng name", nic: "991741136v", role: "eng"});
-    const user2 = new User(con, null, {email: "orgadmin@localhost.com", password: "orgadminpass", name: "orgadmin name", nic: "991741137v", role: "orgAdmin"});
-}
-
-dbInit();
-
 module.exports = con;
