@@ -22,9 +22,15 @@ console.log("Connected to database");
 
 function dbInit(){
 
+    con.query("DROP TABLE IF EXISTS role;");
+    con.query("CREATE TABLE IF NOT EXISTS role (id int PRIMARY KEY, type VARCHAR(255));");
+    con.query("INSERT INTO role (id, type) VALUES (1, 'eng');");
+    con.query("INSERT INTO role (id, type) VALUES (2, 'orgAdmin');");
+    con.query("INSERT INTO role (id, type) VALUES (3, 'superAdmin');");
+
     con.query("DROP TABLE IF EXISTS user;");
-    con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(255) PRIMARY KEY, password VARCHAR(255), name VARCHAR(255), nic VARCHAR(255), type int);");
-    const user1 = new User(con, null, {email: "admin@localhost", password: "adminpass", name: "admin name", nic: "991741136v", userType: "eng"});
+    con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(255) PRIMARY KEY, password VARCHAR(255), name VARCHAR(255), nic VARCHAR(255), role int);");
+    const user1 = new User(con, null, {email: "admin@localhost", password: "adminpass", name: "admin name", nic: "991741136v", role: "eng"});
 }
 
 dbInit();

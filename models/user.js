@@ -19,14 +19,14 @@ class User {
             }
             const pwHash = bcrypt.hashSync(data.password, 12);
 
-            let typeInt = 0;
-            if (data.userType === "eng") {
-                typeInt = 1;
-            } else if (data.userType === "orgAdmin") {
-                typeInt = 2;
+            let roleInt = 0;
+            if (data.role === "eng") {
+                roleInt = 1;
+            } else if (data.role === "orgAdmin") {
+                roleInt = 2;
             }
 
-            con.query("INSERT INTO user (email, password, name, nic, type) VALUES (?, ?, ?, ?, ?)", [data.email, pwHash, data.name, data.nic, typeInt], function (err, result) {
+            con.query("INSERT INTO user (email, password, name, nic, role) VALUES (?, ?, ?, ?, ?)", [data.email, pwHash, data.name, data.nic, roleInt], function (err, result) {
                 if (err) throw err;
                 res?.status(200).json({ 'success': true });
             });
