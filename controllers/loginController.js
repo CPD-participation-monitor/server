@@ -17,10 +17,6 @@ const loginUser = async (req, res) => {
             res.status(400).json({ 'success': false, 'reason': 'Password cannot be empty' });
             return;
         }
-        if (!Validator.validate('password', password)) {
-            res.status(400).json({ 'success': false, 'reason': 'Invalid password format' });
-            return;
-        }
         
         User.login(con, res, req.body);
 

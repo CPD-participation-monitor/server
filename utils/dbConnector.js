@@ -20,6 +20,7 @@ const con = mysql.createConnection({
 if (!con) throw new Error("DB connection failed");
 console.log("Connected to database");
 
+// Remove later
 function dbInit() {
     con.query("DROP TABLE IF EXISTS role;");
     con.query("CREATE TABLE IF NOT EXISTS role (id int PRIMARY KEY, type VARCHAR(255));");
