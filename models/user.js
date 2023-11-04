@@ -8,7 +8,7 @@ if (!KEY) throw new Error("JWT_SECRET not specified");
 class User {
     constructor(con, res, data) {
         this.data = data;
-        this.create(con, res, data);
+        this.create(con, res);
     }
 
     create(con, res) {

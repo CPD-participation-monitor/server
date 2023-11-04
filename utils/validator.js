@@ -11,7 +11,8 @@ class Validator {
     static _patterns = {
         email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
         password: /^[\x21-\x7E]{8,40}$/,
-        name: /^[A-Za-z\s]{2,30}$/
+        name: /^[A-Za-z\s]{2,30}$/,
+        orgName:  /^([a-zA-Z0-9\s\{\}\[\]\(\)\@\#\&\!]+)$/
     };
 
     /**
