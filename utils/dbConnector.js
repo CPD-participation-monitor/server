@@ -21,15 +21,21 @@ if (!con) throw new Error("DB connection failed");
 console.log("Connected to database");
 
 function dbInit() {
+    con.query("DROP TABLE IF EXISTS user_session;");
+    con.query("DROP TABLE IF EXISTS session;");
+    con.query("DROP TABLE IF EXISTS user;");
     con.query("DROP TABLE IF EXISTS role;");
+
     con.query("CREATE TABLE IF NOT EXISTS role (id int PRIMARY KEY, type VARCHAR(255));");
     con.query("INSERT INTO role (id, type) VALUES (1, 'eng');");
     con.query("INSERT INTO role (id, type) VALUES (2, 'orgAdmin');");
     con.query("INSERT INTO role (id, type) VALUES (3, 'superAdmin');");
 
-    con.query("DROP TABLE IF EXISTS user;");
-    con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(60) PRIMARY KEY, password VARCHAR(100), name VARCHAR(100), nic VARCHAR(20), role int);");
-    // const user1 = new 5User(con, null, {email: "admin@localhost", password: "adminpass", name: "admin name", nic: "991741136v", role: "eng"});
+    con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(60) PRIMARY KEY, password VARCHAR(100) NOT NULL, name VARCHAR(100) NOT NULL, nic VARCHAR(20), role INTEGER);");
+
+    con.query("CREATE TABLE IF NOT EXISTS session (sessionId INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) NOT NULL, organization VARCHAR(100) NOT NULL, date CHAR(10) NOT NULL);");
+
+    con.query("CREATE TABLE IF NOT EXISTS user_session (email VARCHAR(60) NOT NULL, sessionId INTEGER NOT NULL, hmac VARCHAR(512) NOT NULL, FOREIGN KEY (email) REFERENCES user(email), FOREIGN KEY (sessionId) REFERENCES session(sessionId));");
 }
 
 dbInit();

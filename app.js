@@ -32,6 +32,9 @@ async function startServer() {
     // authorization route
     app.use('/', require('./routes/auth'));
 
+    // routes for authorized users (login required)
+    app.use('/', require('./routes/certificate'));
+
     // serve
     const PORT = process.env.PORT || 8080;
     app.listen(PORT, console.log("Server has started at port " + PORT));
