@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const { serialize } = require('cookie');
 
 class User {
-    constructor (con, res, data) {
+    constructor(con, res, data) {
         this.data = data;
         this.create(con, res, data);
     }
@@ -85,4 +85,4 @@ class User {
     }
 }
 
-module.exports = {User};
+module.exports = { User };
