@@ -1,19 +1,23 @@
+const { createHmac } = require('crypto');
 const con = require("./dbConnector");
 
+const KEY = process.env.HMAC_SECRET;
+if (!KEY) throw new Error("HMAC_SECRET not specified");
+
 const addSession = () => {
-    
+
 }
 
 const addUserSession = () => {
-    
+
 }
 
 const addAllUsersSession = () => {
-    
+
 }
 
 const getUserSession = () => {
-    
+
 }
 
 const getUserAllSessions = (email, cb) => {
@@ -25,12 +29,14 @@ const getUserAllSessions = (email, cb) => {
             const organization = item.organization;
             const date = item.organization;
             const hmac = item.hmac;
-            let hmacExpected = getHmac(`${email}|${name}|${organization}|${date}`, secret);
+            const hmacCreator = createHmac('sha256', KEY);
+            hmacCreator.update(`${email}|${name}|${organization}|${date}`, 'utf8');
+            let hmacExpected = hmacCreator.digest().toString('base64');
             if (hmac !== hmacExpected) {
                 console.log('HMAC not matching');
                 continue;
             }
-            sessions.push(item.sessionId);
+            sessions.push({name, organization, date});
         }
         cb(sessions);
     });
