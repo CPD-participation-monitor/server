@@ -34,6 +34,8 @@ async function startServer() {
 
     // routes for authorized users (login required)
     app.use('/', require('./routes/certificate'));
+    
+    app.use('/', require('./routes/orgAdmin'));
 
     // serve
     const PORT = process.env.PORT || 8080;
