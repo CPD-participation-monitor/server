@@ -27,9 +27,9 @@ function dbInit() {
     con.query("DROP TABLE IF EXISTS role;");
 
     con.query("CREATE TABLE IF NOT EXISTS role (id int PRIMARY KEY, type VARCHAR(255));");
-    con.query("INSERT INTO role (id, type) VALUES (1, 'eng');");
-    con.query("INSERT INTO role (id, type) VALUES (2, 'orgAdmin');");
-    con.query("INSERT INTO role (id, type) VALUES (3, 'superAdmin');");
+    con.query("INSERT INTO role (id, type) VALUES (2044, 'eng');");
+    con.query("INSERT INTO role (id, type) VALUES (6445, 'orgAdmin');");
+    con.query("INSERT INTO role (id, type) VALUES (3112, 'superAdmin');");
 
     con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(60) PRIMARY KEY, password VARCHAR(100) NOT NULL, name VARCHAR(100) NOT NULL, nic VARCHAR(20), role INTEGER);");
 
