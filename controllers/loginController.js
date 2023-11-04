@@ -17,8 +17,8 @@ const loginUser = async (req, res) => {
             res.status(400).json({ 'success': false, 'reason': 'Password cannot be empty' });
             return;
         }
-        
-        User.login(con, res, req.body);
+
+        User.login(con, res, { email, password });
 
     } catch (err) {
         console.log(err);

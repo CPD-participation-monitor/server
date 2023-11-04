@@ -2,6 +2,9 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const { serialize } = require('cookie');
 
+const KEY = process.env.JWT_SECRET;
+if (!KEY) throw new Error("JWT_SECRET not specified");
+
 class User {
     constructor(con, res, data) {
         this.data = data;
@@ -35,16 +38,13 @@ class User {
         });
     };
 
-    static login(con, res, data){
-
-        const KEY = process.env.JWT_SECRET;
-        if (!KEY) throw new Error("JWT_SECRET not specified");
+    static login(con, res, data) {
 
         const email = data.email;
         const password = data.password;
 
         con.query("SELECT password, name, role FROM user WHERE email = ?", [email], async function (err, result) {
-            
+
             if (err) throw err;
             if (result.length !== 1) {
                 res.status(401).json({ 'success': false, 'reason': 'No such user' });
@@ -57,7 +57,7 @@ class User {
                 const token = jwt.sign({ "email": email }, KEY, {
                     expiresIn: "6h",
                 });
-                const serialized = serialize('token', token, {
+                const serialized = serialize('access_token', token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
                     sameSite: 'strict',
