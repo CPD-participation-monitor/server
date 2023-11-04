@@ -22,9 +22,9 @@ console.log("Connected to database");
 
 function dbInit(){
 
-    con.query("DROP TABLE IF EXISTS user;");
-    con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(255) PRIMARY KEY, password VARCHAR(255), name VARCHAR(255), nic VARCHAR(255), type int);");
-    const user1 = new User(con, null, {email: "admin@localhost", password: "adminpass", name: "admin name", nic: "991741136v", userType: "eng"});
+    // con.query("DROP TABLE IF EXISTS user;");
+    con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(60) PRIMARY KEY, password VARCHAR(100), name VARCHAR(100), nic VARCHAR(20), type int);");
+    // const user1 = new User(con, null, {email: "admin@localhost", password: "adminpass", name: "admin name", nic: "991741136v", userType: "eng"});
 }
 
 dbInit();

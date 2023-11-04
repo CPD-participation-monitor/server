@@ -4,7 +4,7 @@ const User = require("../models/user").User;
 
 const signupUser = (req, res) => {
     try {
-        const { email, password, name } = req.body;
+        const { email, password, name, userType, nic } = req.body;
         if (!email) {
             res.status(400).json({ 'success': false, 'reason': 'Email cannot be empty' });
             return;
@@ -30,7 +30,7 @@ const signupUser = (req, res) => {
             return;
         }
         
-        const user = new User(con, res, req.body);
+        const user = new User(con, res, { email, password, name, userType, nic });
 
     } catch (err) {
         console.log(err);

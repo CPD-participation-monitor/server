@@ -38,7 +38,7 @@ const loginUser = async (req, res) => {
                 const token = jwt.sign({ "email": email }, KEY, {
                     expiresIn: "6h",
                 });
-                const serialized = serialize('token', token, {
+                const serialized = serialize('access_token', token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
                     sameSite: 'strict',
