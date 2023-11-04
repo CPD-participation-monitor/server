@@ -1,11 +1,6 @@
 const Validator = require("../utils/validator");
 const con = require("../utils/dbConnector");
-const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
-const { serialize } = require('cookie');
-
-const KEY = process.env.JWT_SECRET;
-if (!KEY) throw new Error("JWT_SECRET not specified");
+const User = require("../models/user").User;
 
 const loginUser = async (req, res) => {
     try {
@@ -26,31 +21,9 @@ const loginUser = async (req, res) => {
             res.status(400).json({ 'success': false, 'reason': 'Invalid password format' });
             return;
         }
-        con.query("SELECT password, name FROM user WHERE email = ?", [email], async function (err, result) {
-            if (err) throw err;
-            if (result.length !== 1) {
-                res.status(401).json({ 'success': false, 'reason': 'No such user' });
-                return;
-            }
-            const pwHash = result[0]['password'];
-            if (bcrypt.compareSync(password, pwHash)) {
-                const name = result[0]['name'];
-                const token = jwt.sign({ "email": email }, KEY, {
-                    expiresIn: "6h",
-                });
-                const serialized = serialize('token', token, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict',
-                    maxAge: 60 * 60 * 6, // 6 hours
-                    path: '/',
-                });
-                res.setHeader('Set-Cookie', serialized);
-                res.status(200).json({ 'success': true, 'name': name });
-                return;
-            }
-            res.status(401).json({ 'success': false, 'reason': 'Incorrect password' });
-        });
+        
+        User.login(con, res, req.body);
+
     } catch (err) {
         console.log(err);
         res.status(500).json({ 'success': false, 'reason': 'Error occured' });

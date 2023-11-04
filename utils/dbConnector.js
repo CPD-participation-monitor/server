@@ -30,7 +30,8 @@ function dbInit(){
 
     con.query("DROP TABLE IF EXISTS user;");
     con.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(255) PRIMARY KEY, password VARCHAR(255), name VARCHAR(255), nic VARCHAR(255), role int);");
-    const user1 = new User(con, null, {email: "admin@localhost", password: "adminpass", name: "admin name", nic: "991741136v", role: "eng"});
+    const user1 = new User(con, null, {email: "eng@localhost.com", password: "engpass", name: "eng name", nic: "991741136v", role: "eng"});
+    const user2 = new User(con, null, {email: "orgadmin@localhost.com", password: "orgadminpass", name: "orgadmin name", nic: "991741137v", role: "orgAdmin"});
 }
 
 dbInit();
