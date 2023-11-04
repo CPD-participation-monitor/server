@@ -1,5 +1,6 @@
-const mysql = require("mysql2/promise");
-require("dotenv").config();
+const mysql = require(`mysql2/promise`);
+const bcrypt = require(`bcrypt`);
+require(`dotenv`).config();
 
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
@@ -38,8 +39,10 @@ async function migrate() {
     await db.query("INSERT INTO role (id, type) VALUES (3112, 'superAdmin');");
 
     await db.query("CREATE TABLE IF NOT EXISTS user (email VARCHAR(60) PRIMARY KEY, password VARCHAR(100) NOT NULL, name VARCHAR(100) NOT NULL, nic VARCHAR(20), role INTEGER);");
-    await db.query("INSERT INTO user VALUES (\"eng@localhost.com\", \"engpass\", \"eng name\", \"991741136v\", 2044);");
-    await db.query("INSERT INTO user VALUES (\"orgadmin@localhost.com\", \"orgadminpass\", \"orgadmin name\", \"991741137v\", 6445);");
+    let pw = bcrypt.hashSync("engpass", 12);
+    await db.query(`INSERT INTO user VALUES ("eng@localhost.com", "${pw}", "eng name", "991741136v", 2044);`);
+    pw = bcrypt.hashSync("orgadminpass", 12);
+    await db.query(`INSERT INTO user VALUES ("orgadmin@localhost.com", "${pw}", "orgadmin name", "991741137v", 6445);`);
 
     await db.query("CREATE TABLE IF NOT EXISTS org (name VARCHAR(100) PRIMARY KEY);");
     await db.query("INSERT INTO org VALUES (\"IESL\");");
