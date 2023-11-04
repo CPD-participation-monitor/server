@@ -53,6 +53,7 @@ class User {
             const pwHash = result[0]['password'];
             if (bcrypt.compareSync(password, pwHash)) {
                 const name = result[0]['name'];
+                const role = result[0]['role'];
                 const token = jwt.sign({ "email": email }, KEY, {
                     expiresIn: "6h",
                 });
@@ -64,20 +65,8 @@ class User {
                     path: '/',
                 });
 
-                // find role
-                await con.query("SELECT type FROM role WHERE id = ?", [result[0]['role']], function (err, result) {
-                    if (err) throw err;
-                    if (result.length !== 1) {
-                        return null;
-                    }
-                    const type = result[0]['type'];
-
-                    res.setHeader('Set-Cookie', serialized);
-                    res.status(200).json({ 'success': true, 'name': name, 'role': type });
-                    return;
-
-                });
-
+                res.setHeader('Set-Cookie', serialized);
+                res.status(200).json({ 'success': true, 'name': name, 'role': role });
                 return;
             }
             res.status(401).json({ 'success': false, 'reason': 'Incorrect password' });
