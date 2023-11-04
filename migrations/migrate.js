@@ -37,6 +37,14 @@ async function migrate() {
     await db.query("INSERT INTO user VALUES (\"eng@localhost.com\", \"engpass\", \"eng name\", \"991741136v\", 2044);");
     await db.query("INSERT INTO user VALUES (\"orgadmin@localhost.com\", \"orgadminpass\", \"orgadmin name\", \"991741137v\", 6445);");
     
+    await db.query("drop table if exists org;");
+    await db.query("CREATE TABLE IF NOT EXISTS org (name VARCHAR(255) PRIMARY KEY);");
+    await db.query("INSERT INTO org VALUES (\"IESL\");");
+
+    await db.query("drop table if exists session;");
+    await db.query("CREATE TABLE IF NOT EXISTS session (id int PRIMARY KEY AUTO_INCREMENT, org VARCHAR(255), FOREIGN KEY (org) REFERENCES org(name));");
+    await db.query("INSERT INTO session (org) VALUES (\"IESL\");");
+
     process.exit();
 }
 migrate();
