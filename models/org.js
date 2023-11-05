@@ -40,7 +40,7 @@ class Org{
     
                     for(let i = 0; i < result.length; i++){
                         returnOrgs.push({
-                            id: toString(result[i].id),
+                            id: result[i].id.toString(),
                             name: result[i].orgName,
                             email: result[i].email,
                             members: orgCount[result[i].id]
@@ -55,6 +55,10 @@ class Org{
             console.log(err);
             res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
         }
+    }
+
+    static joinOrg(con, res, data){
+
     }
 }
 
