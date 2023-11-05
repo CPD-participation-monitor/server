@@ -40,7 +40,7 @@ class Org{
     
                     for(let i = 0; i < result.length; i++){
                         returnOrgs.push({
-                            id: result[i].id,
+                            id: toString(result[i].id),
                             name: result[i].orgName,
                             email: result[i].email,
                             members: orgCount[result[i].id]
