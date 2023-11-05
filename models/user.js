@@ -88,6 +88,25 @@ class User {
             res.status(401).json({ 'success': false, 'reason': 'Incorrect password' });
         });
     }
+
+    static promoteToSuperAdmin(con, res, data) {
+        const email = data.email;
+
+        con.query("SELECT count(*) FROM user WHERE email = ?", [email], async function (err, result) {
+            if (err) throw err;
+            let count = result[0]['count(*)'];
+            if (count !== 1) {
+                console.log("No such user");
+                res.status(409).json({ 'success': false, 'reason': 'No such user' });
+                return;
+            }
+
+            con.query("UPDATE user SET role = 3112 WHERE email = ?", [email], function (err, result) {
+                if (err) throw err;
+                res.status(200).json({ 'success': true });
+            });
+        });
+    }
 }
 
 module.exports = { User };

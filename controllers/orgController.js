@@ -1,10 +1,11 @@
 const Validator = require("../utils/validator");
 const con = require("../utils/dbConnector");
 const Org = require("../models/org").Org;
+const User = require("../models/user").User;
 
 const createOrg = async (req, res) => {
     try {
-        const { orgName, email } = req.body;
+        const { orgName, email, creatorEmail } = req.body;
         if (!email) {
             res.status(400).json({ 'success': false, 'reason': 'Email cannot be empty' });
             return;
@@ -23,6 +24,7 @@ const createOrg = async (req, res) => {
         // }
 
         const org = new Org(con, res, { orgName: orgName, email: email });
+        User.promoteToSuperAdmin(con, res, { email: creatorEmail });
 
     } catch (err) {
         console.log(err);
@@ -42,4 +44,8 @@ const getRequests = async (req, res) => {
     Org.getRequests(con, res, req.body);
 };
 
-module.exports = { createOrg, getOrgs, requestToJoin, getRequests };
+const acceptRequest = async (req, res) => {
+    Org.acceptRequest(con, res, req.body);
+};
+
+module.exports = { createOrg, getOrgs, requestToJoin, getRequests, acceptRequest };

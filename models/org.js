@@ -110,6 +110,33 @@ class Org{
         });
 
     }
+
+    static acceptRequest(con, res, data){
+            
+            const orgID = data.orgID;
+            const email = data.email;
+    
+            con.query(`delete from request where email = "${email}" and orgID = ${orgID};`, function(err, result){
+                if(err) throw err;
+
+                // check if user is already an admin
+                con.query(`select * from admin_org where email = "${email}"`, function(err, result){
+                    if(err) throw err;
+
+                    if(result.length !== 0){
+                        res.status(409).json({ 'success': false, 'reason': 'User is already an admin' });
+                        return;
+                    }
+
+                    con.query(`insert into admin_org values ("${email}", ${orgID});`, function(err, result){
+                        if(err) throw err;
+    
+                        res.status(200).json({ 'success': true });
+                        return;
+                    });
+                });
+            });
+    }
 }
 
 module.exports = { Org };
