@@ -58,7 +58,14 @@ class Org{
     }
 
     static joinOrg(con, res, data){
+        try{
 
+            
+
+        } catch(err){
+            console.log(err);
+            res?.status(500).json({ 'success': false, 'reason': 'Error occured when joining org.' });
+        }
     }
 }
 
