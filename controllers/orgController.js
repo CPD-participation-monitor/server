@@ -22,7 +22,6 @@ const createOrg = async (req, res) => {
         //     return;
         // }
 
-        console.log("here");
         const org = new Org(con, res, { orgName: orgName, email: email });
 
     } catch (err) {
@@ -31,4 +30,8 @@ const createOrg = async (req, res) => {
     }
 };
 
-module.exports = { createOrg };
+const getOrgs = async (req, res) => {
+    Org.getOrgs(con, res);
+};
+
+module.exports = { createOrg, getOrgs };
