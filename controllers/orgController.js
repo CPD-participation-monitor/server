@@ -30,8 +30,16 @@ const createOrg = async (req, res) => {
     }
 };
 
+const requestToJoin = async (req, res) => {
+    Org.requestToJoin(con, res, req.body);
+};
+
 const getOrgs = async (req, res) => {
     Org.getOrgs(con, res);
 };
 
-module.exports = { createOrg, getOrgs };
+const getRequests = async (req, res) => {
+    Org.getRequests(con, res, req.body);
+};
+
+module.exports = { createOrg, getOrgs, requestToJoin, getRequests };

@@ -18,7 +18,7 @@ class Org{
 
             con.query("INSERT INTO org (orgName, email) VALUES (?, ?)", [data.orgName, data.email], function (err, result) {
                 if (err) throw err;
-                res?.status(200).json({ 'success': true });
+                res.status(200).json({ 'success': true });
             });
         });
     }
@@ -47,7 +47,7 @@ class Org{
                         });
                     }
     
-                    res?.status(200).json({ 'success': true, 'orgs': returnOrgs });
+                    res.status(200).json({ 'success': true, 'orgs': returnOrgs });
                 });
             });
         }
@@ -57,15 +57,58 @@ class Org{
         }
     }
 
-    static joinOrg(con, res, data){
-        try{
+    static requestToJoin(con, res, data){
 
-            
+        const orgID = data.orgID;
+        const email = data.email;
 
-        } catch(err){
-            console.log(err);
-            res?.status(500).json({ 'success': false, 'reason': 'Error occured when joining org.' });
-        }
+        con.query(`select * from request where email = "${email}" and orgID = ${orgID};`, function(err, result){
+            if(err) throw err;
+
+            if(result.length !== 0){
+                res.status(409).json({ 'success': false, 'reason': 'Request already exists' });
+                return;
+            }
+
+            con.query(`insert into request values (${orgID}, "${email}");`, function(err, result){
+                if(err) throw err;
+
+                res?.status(200).json({ 'success': true });
+                return;
+            });
+        });
+
+    }
+
+    static getRequests(con, res, data){
+
+        const email = data.email;
+
+        con.query(`select role from user where email = "${email}";`, function(err, result){
+            if(err) throw err;
+
+            if(result[0].role !== 3112){
+                res.status(403).json({ 'success': false, 'reason': 'Unauthorized' });
+                return;
+            }
+
+            con.query(`select * from request where orgID in (select orgID from admin_org where email = "${email}");`, function(err, result){
+                if(err) throw err;
+
+                let requests = [];
+
+                result.forEach(row => {
+                    requests.push({
+                        orgID: row.orgID,
+                        email: row.email
+                    });
+                });
+
+                res.status(200).json({ 'success': true, 'requests': requests });
+                return;
+            });
+        });
+
     }
 }
 
