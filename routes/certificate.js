@@ -1,9 +1,8 @@
 const express = require('express');
-const { issueCertificate, verifyCertificate } = require('../controllers/certificateController');
+const { issueCertificate } = require('../controllers/certificateController');
 
 const router = express.Router();
 
-router.post('/certificate/generate', issueCertificate);
-router.post('/certificate/verify', verifyCertificate);
+router.post('/generate', issueCertificate);
 
 module.exports = router;

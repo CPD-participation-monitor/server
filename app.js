@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const allowedOrigins = require('./allowedOrigins');
@@ -8,7 +9,7 @@ require("dotenv").config({ path: "./.env" });
 const corsOpts = {
     origin: allowedOrigins,
     credentials: true,
-    methods: ['GET','POST'],
+    methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type'],
     exposedHeaders: ['Content-Type']
 };
@@ -25,16 +26,19 @@ async function startServer() {
     // set http headers for security
     app.disable('x-powered-by');
 
+    app.use('/public/publicKey.pem', express.static(path.join(__dirname, 'keys/publicKey.pem')));
+
     // routes for any user (login not required)
     app.use('/', require('./routes/login'));
     app.use('/', require('./routes/signup'));
-    
+    app.use('/certificate/', require('./routes/certificatePub'));
+
     // authorization route
     app.use('/', require('./routes/auth'));
 
     // routes for authorized users (login required)
-    app.use('/', require('./routes/certificate'));
-    
+    app.use('/certificate/', require('./routes/certificate'));
+
     app.use('/api-org', require('./routes/org'));
 
     // serve
