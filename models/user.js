@@ -72,14 +72,14 @@ class User {
                 con.query(`select email, orgID from admin_org where email="${email}";`, function (err, result) {
                     if (err) throw err;
 
-                    let user = {'name': name, 'role': role, 'email': email};
+                    let user = { 'name': name, 'role': role, 'email': email };
 
-                    if(result.length !== 0){
+                    if (result.length !== 0) {
                         user['orgID'] = result[0].orgID;
                     }
 
                     res.setHeader('Set-Cookie', serialized);
-                    res.status(200).json({ 'success': true, 'user':user });
+                    res.status(200).json({ 'success': true, 'user': user });
                     return;
                 });
 

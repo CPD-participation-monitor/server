@@ -30,7 +30,7 @@ const filterSessions = (email, results) => {
             console.log('HMAC not matching');
             continue;
         }
-        sessions.push({name, organization, date});
+        sessions.push({ name, organization, date });
     }
     return sessions;
 }
