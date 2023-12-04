@@ -29,6 +29,22 @@ const signupUser = (req, res) => {
             res.status(400).json({ 'success': false, 'reason': 'Invalid name format' });
             return;
         }
+        if (!nic) {
+            res.status(400).json({ 'success': false, 'reason': 'NIC cannot be empty' });
+            return;
+        }
+        if (!Validator.validate('nic', nic)) {
+            res.status(400).json({ 'success': false, 'reason': 'Invalid nic format' });
+            return;
+        }
+        if (!role) {
+            res.status(400).json({ 'success': false, 'reason': 'Role cannot be empty' });
+            return;
+        }
+        if (!Validator.validate('role', role)) {
+            res.status(400).json({ 'success': false, 'reason': 'Invalid role format' });
+            return;
+        }
 
         const user = new User(con, res, { email, password, name, nic, role });
 
