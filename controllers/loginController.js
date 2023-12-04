@@ -21,7 +21,7 @@ const loginUser = async (req, res) => {
         User.login(con, res, { email, password });
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({ 'success': false, 'reason': 'Error occured' });
     }
 };

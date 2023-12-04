@@ -58,9 +58,9 @@ async function migrate() {
     await db.query(`INSERT INTO user VALUES ("orgadmin@sliot3.com", "${pw}", "iesl orgadmin name 3", "991741153v", 6445);`);
 
     // Org
-    await db.query("CREATE TABLE IF NOT EXISTS org (id int AUTO_INCREMENT, orgName VARCHAR(100) UNIQUE NOT NULL, email VARCHAR(60) NOT NULL, PRIMARY KEY(id));");
-    await db.query("INSERT INTO org (orgName, email) VALUES (\"IESL\", \"iesl@email.com\");");
-    await db.query("INSERT INTO org (orgName, email) VALUES (\"SLIOT\", \"sliot@email.com\");");
+    await db.query('CREATE TABLE IF NOT EXISTS org (id int AUTO_INCREMENT, orgName VARCHAR(100) UNIQUE NOT NULL, email VARCHAR(60) NOT NULL, description VARCHAR(500) NOT NULL DEFAULT "", PRIMARY KEY(id));');
+    await db.query('INSERT INTO org (orgName, email, description) VALUES ("IESL", "iesl@email.com", "This is IESL");');
+    await db.query('INSERT INTO org (orgName, email, description) VALUES ("SLIOT", "sliot@email.com", "This is SLIOT");');
 
     // Request
     await db.query("CREATE TABLE IF NOT EXISTS request (orgID int NOT NULL, email VARCHAR(60) NOT NULL, FOREIGN KEY (orgID) REFERENCES org(id), FOREIGN KEY (email) REFERENCES user(email));");

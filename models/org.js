@@ -5,54 +5,84 @@ class Org {
     }
 
     create(con, res) {
-        let data = this.data;
+        try {
+            let data = this.data;
 
-        con.query("select count(*) from org where orgName = ?", [data.orgName], async function (err, result) {
-            if (err) throw err;
-            let count = result[0]['count(*)'];
-            if (count !== 0) {
-                console.log("Org already exists");
-                res?.status(409).json({ 'success': false, 'reason': 'Org already exists' });
-                return;
-            }
+            con.query("select count(*) from org where orgName = ?", [data.orgName], async function (err, result) {
+                try {
+                    if (err) throw err;
+                    let count = result[0]['count(*)'];
+                    if (count !== 0) {
+                        console.log("Org already exists");
+                        res?.status(409).json({ 'success': false, 'reason': 'Org already exists' });
+                        return;
+                    }
 
-            con.query("INSERT INTO org (orgName, email) VALUES (?, ?)", [data.orgName, data.email], function (err, result) {
-                if (err) throw err;
-                res.status(200).json({ 'success': true });
+                    con.query("INSERT INTO org (orgName, email) VALUES (?, ?)", [data.orgName, data.email], function (err, result) {
+                        try {
+                            if (err) throw err;
+                            res.status(200).json({ 'success': true });
+                        }
+                        catch (err) {
+                            console.error(err);
+                            res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+                        }
+                    });
+                }
+                catch (err) {
+                    console.error(err);
+                    res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+                }
             });
-        });
+        }
+        catch (err) {
+            console.error(err);
+            res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+        }
     }
 
     static getOrgs(con, res) {
         try {
             con.query("SELECT * FROM org", function (err, result) {
-                if (err) throw err;
-
-                con.query("select orgId, count(*) from admin_org group by (orgID);", function (err, result2) {
+                try {
                     if (err) throw err;
 
-                    const orgCount = {};
-                    result2.forEach(row => {
-                        orgCount[row.orgId] = row['count(*)'];
+                    con.query("select orgId, count(*) from admin_org group by (orgID);", function (err, result2) {
+                        try {
+                            if (err) throw err;
+
+                            const orgCount = {};
+                            result2.forEach(row => {
+                                orgCount[row.orgId] = row['count(*)'];
+                            });
+
+                            let returnOrgs = [];
+
+                            for (let i = 0; i < result.length; i++) {
+                                returnOrgs.push({
+                                    id: result[i].id.toString(),
+                                    name: result[i].orgName,
+                                    email: result[i].email,
+                                    members: orgCount[result[i].id]
+                                });
+                            }
+
+                            res.status(200).json({ 'success': true, 'orgs': returnOrgs });
+                        }
+                        catch (err) {
+                            console.error(err);
+                            res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+                        }
                     });
-
-                    let returnOrgs = [];
-
-                    for (let i = 0; i < result.length; i++) {
-                        returnOrgs.push({
-                            id: result[i].id.toString(),
-                            name: result[i].orgName,
-                            email: result[i].email,
-                            members: orgCount[result[i].id]
-                        });
-                    }
-
-                    res.status(200).json({ 'success': true, 'orgs': returnOrgs });
-                });
+                }
+                catch (err) {
+                    console.error(err);
+                    res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+                }
             });
         }
         catch (err) {
-            console.log(err);
+            console.error(err);
             res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
         }
     }

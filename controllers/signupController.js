@@ -49,7 +49,7 @@ const signupUser = (req, res) => {
         const user = new User(con, res, { email, password, name, nic, role });
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({ 'success': false, 'reason': 'Error occured' });
     }
 };

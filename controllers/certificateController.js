@@ -13,16 +13,22 @@ const issueCertificate = (req, res) => {
             sessions = req.body.sessions;
         }
         cb = sessions => {
-            const certData = { email, sessions };
-            if (sessions.length > 0) {
-                const signer = crypto.createSign('sha256');
-                signer.write(JSON.stringify(certData));
-                signer.end();
-                const signature = signer.sign(private_key, 'base64');
-                res.json({ 'data': certData, signature });
-            } else {
-                // no data => nothing to sign
-                res.json({ 'data': certData });
+            try {
+                const certData = { email, sessions };
+                if (sessions.length > 0) {
+                    const signer = crypto.createSign('sha256');
+                    signer.write(JSON.stringify(certData));
+                    signer.end();
+                    const signature = signer.sign(private_key, 'base64');
+                    res.json({ 'data': certData, signature });
+                } else {
+                    // no data => nothing to sign
+                    res.json({ 'data': certData });
+                }
+            }
+            catch (err) {
+                console.error(err);
+                res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
             }
         }
         if (sessions) {
@@ -31,7 +37,7 @@ const issueCertificate = (req, res) => {
             getUserAllSessions(email, cb);
         }
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({ 'success': false, 'reason': 'Error occured' });
     }
 };
@@ -47,7 +53,7 @@ const verifyCertificate = (req, res) => {
         verify.end();
         res.json({ 'valid': verify.verify(public_key, signature, 'base64') });
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({ 'success': false, 'reason': 'Error occured' });
     }
 };

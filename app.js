@@ -31,6 +31,7 @@ async function startServer() {
     // routes for any user (login not required)
     app.use('/', require('./routes/login'));
     app.use('/', require('./routes/signup'));
+    app.use('/', require('./routes/publicOrgs'));
     app.use('/certificate/', require('./routes/certificatePub'));
 
     // authorization route
