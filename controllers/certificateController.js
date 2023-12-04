@@ -2,7 +2,6 @@ const crypto = require('crypto');
 const fs = require('fs');
 const { getUserSessions, getUserAllSessions } = require("../utils/sessionHelper");
 
-// See keys/README.md on how to generate this key
 const private_key = fs.readFileSync('keys/privateKey.pem', 'utf-8');
 const public_key = fs.readFileSync('keys/publicKey.pem', 'utf-8');
 
