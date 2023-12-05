@@ -6,7 +6,7 @@ const router = express.Router();
 router.post('/createOrganization', createOrg);
 router.get('/getOrgs', getOrgs);
 router.post('/requestToJoin', requestToJoin);
-router.post('/getRequests', getRequests);
+router.get('/getRequests', getRequests);
 router.post('/acceptRequest', acceptRequest);
 
 module.exports = router;

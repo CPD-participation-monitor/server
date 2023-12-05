@@ -77,19 +77,20 @@ class Org {
     static getRequests(con, res, email) {
         try {
             con.query('SELECT * FROM request WHERE orgID IN (SELECT orgID FROM admin_org WHERE email = ?)', [email], (err, result) => {
-                if (err) throw err;
+                try {
+                    if (err) throw err;
 
-                let requests = [];
+                    let requests = [];
 
-                result.forEach(row => {
-                    requests.push({
-                        orgID: row.orgID,
-                        email: row.email
+                    result.forEach(row => {
+                        requests.push(row.email);
                     });
-                });
 
-                res?.status(200).json({ success: true, 'requests': requests });
-                return;
+                    res?.status(200).json({ success: true, 'requests': requests });
+                } catch (err) {
+                    console.error(err);
+                    res?.status(500).json({ success: false, reason: 'Error occured' });
+                }
             });
         } catch (err) {
             console.error(err);

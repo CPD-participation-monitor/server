@@ -95,6 +95,7 @@ const getOrgs = async (req, res) => {
 /**
  * Get a list of all organization names and their descriptions.
  * Accessible by anyone even without authentication.
+ * 
  * @param {*} req 
  * @param {*} res 
  */
@@ -127,6 +128,7 @@ const getOrgsPublic = (req, res) => {
 /**
  * Get a list of all session names and dates of an organization.
  * Accessible by anyone even without authentication.
+ * 
  * @param {*} req 
  * @param {*} res 
  */
@@ -164,11 +166,19 @@ const getOrgSessionsPublic = (req, res) => {
     }
 };
 
+/**
+ * Get a list of all join request emails for the organization.
+ * Accessible only by org admins and super admins.
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
 const getRequests = async (req, res) => {
     try {
         const email = req.email;
-        if (req.role !== 3112) {
-            res?.status(403).json({ success: false, reason: 'Not the SuperAdmin.' });
+        if (req.role !== 3112 && req.role !== 6445) {
+            res?.status(403).json({ success: false, reason: 'Not an admin' });
             return;
         }
         Org.getRequests(con, res, email);
