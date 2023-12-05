@@ -18,6 +18,7 @@ async function startServer() {
     // express app
     const app = express();
     app.set('view engine', 'ejs');
+    app.set('env', 'production')
     app.use(cors(corsOpts));
     app.use(express.urlencoded({ limit: "5mb", extended: true, parameterLimit: 10 }));
     app.use(express.json());
@@ -39,7 +40,6 @@ async function startServer() {
 
     // routes for authorized users (login required)
     app.use('/certificate/', require('./routes/certificate'));
-
     app.use('/api-org', require('./routes/org'));
 
     // serve

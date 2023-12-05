@@ -9,13 +9,13 @@ class Org {
                 try {
                     if (err) throw err;
 
-                    con.query("select orgId, count(*) from admin_org group by (orgID);", function (err, result2) {
+                    con.query('SELECT orgID, count(*) from admin_org group by (orgID)', (err, result2) => {
                         try {
                             if (err) throw err;
 
                             const orgCount = {};
                             result2.forEach(row => {
-                                orgCount[row.orgId] = row['count(*)'];
+                                orgCount[row.orgID] = row['count(*)'];
                             });
 
                             let returnOrgs = [];
@@ -29,23 +29,20 @@ class Org {
                                 });
                             }
 
-                            res?.status(200).json({ 'success': true, 'orgs': returnOrgs });
-                        }
-                        catch (err) {
+                            res?.status(200).json({ success: true, 'orgs': returnOrgs });
+                        } catch (err) {
                             console.error(err);
-                            res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+                            res?.status(500).json({ success: false, reason: 'Error occured when retrieving orgs.' });
                         }
                     });
-                }
-                catch (err) {
+                } catch (err) {
                     console.error(err);
-                    res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+                    res?.status(500).json({ success: false, reason: 'Error occured when retrieving orgs.' });
                 }
             });
-        }
-        catch (err) {
+        } catch (err) {
             console.error(err);
-            res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+            res?.status(500).json({ success: false, reason: 'Error occured when retrieving orgs.' });
         }
     }
 
@@ -56,40 +53,30 @@ class Org {
                     if (err) throw err;
 
                     if (result.length !== 0) {
-                        res?.status(409).json({ 'success': false, 'reason': 'Request already exists' });
+                        res?.status(409).json({ success: false, reason: 'Request already exists' });
                         return;
                     }
 
                     con.query('INSERT INTO request (orgID, email) VALUES (?, ?)', [orgID, email], function (err, result) {
                         if (err) throw err;
 
-                        res?.status(200).json({ 'success': true });
+                        res?.status(200).json({ success: true });
                         return;
                     });
                 } catch (err) {
                     console.error(err);
-                    res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                    res?.status(500).json({ success: false, reason: 'Error occured' });
                 }
             });
         } catch (err) {
             console.error(err);
-            res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+            res?.status(500).json({ success: false, reason: 'Error occured' });
         }
     }
 
-    static getRequests(con, res, data) {
-
-        const email = data.email;
-
-        con.query(`select role from user where email = "${email}";`, function (err, result) {
-            if (err) throw err;
-
-            if (result[0].role !== 3112) {
-                res?.status(403).json({ 'success': false, 'reason': 'Not the SuperAdmin.' });
-                return;
-            }
-
-            con.query(`select * from request where orgID in (select orgID from admin_org where email = "${email}");`, function (err, result) {
+    static getRequests(con, res, email) {
+        try {
+            con.query('SELECT * FROM request WHERE orgID IN (SELECT orgID FROM admin_org WHERE email = ?)', [email], (err, result) => {
                 if (err) throw err;
 
                 let requests = [];
@@ -101,11 +88,13 @@ class Org {
                     });
                 });
 
-                res?.status(200).json({ 'success': true, 'requests': requests });
+                res?.status(200).json({ success: true, 'requests': requests });
                 return;
             });
-        });
-
+        } catch (err) {
+            console.error(err);
+            res?.status(500).json({ success: false, reason: 'Error occured' });
+        }
     }
 
     static acceptRequest(con, res, data) {
@@ -121,14 +110,14 @@ class Org {
                 if (err) throw err;
 
                 if (result.length !== 0) {
-                    res?.status(409).json({ 'success': false, 'reason': 'User is already an admin' });
+                    res?.status(409).json({ success: false, reason: 'User is already an admin' });
                     return;
                 }
 
                 con.query(`insert into admin_org values ("${email}", ${orgID});`, function (err, result) {
                     if (err) throw err;
 
-                    res?.status(200).json({ 'success': true });
+                    res?.status(200).json({ success: true });
                     return;
                 });
             });

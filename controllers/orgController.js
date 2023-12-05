@@ -8,19 +8,19 @@ const createOrg = async (req, res) => {
         const { orgName, email } = req.body;
         const creatorEmail = req.email;
         if (!email) {
-            res?.status(400).json({ 'success': false, 'reason': 'Email cannot be empty' });
+            res?.status(400).json({ success: false, reason: 'Email cannot be empty' });
             return;
         }
         if (!Validator.validate('email', email)) {
-            res?.status(400).json({ 'success': false, 'reason': 'Invalid email format' });
+            res?.status(400).json({ success: false, reason: 'Invalid email format' });
             return;
         }
         if (!orgName) {
-            res?.status(400).json({ 'success': false, 'reason': 'Org name cannot be empty' });
+            res?.status(400).json({ success: false, reason: 'Org name cannot be empty' });
             return;
         }
         if (!Validator.validate('orgName', orgName)) {
-            res?.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
+            res?.status(400).json({ success: false, reason: 'Invalid orgName format' });
             return;
         }
 
@@ -29,7 +29,7 @@ const createOrg = async (req, res) => {
                 if (err) throw err;
                 if (result.length !== 0) {
                     console.log("Org already exists");
-                    res?.status(409).json({ 'success': false, 'reason': 'Org already exists' });
+                    res?.status(409).json({ success: false, reason: 'Org already exists' });
                     return;
                 }
                 con.query('INSERT INTO org (orgName, email) VALUES (?, ?)', [orgName, email], (err, result2) => {
@@ -43,50 +43,46 @@ const createOrg = async (req, res) => {
                                 con.query('UPDATE user SET role = 3112 WHERE email = ?', [creatorEmail], function (err, result3) {
                                     try {
                                         if (err) throw err;
-                                        res?.status(200).json({ 'success': true });
-                                    }
-                                    catch (err) {
+                                        res?.status(200).json({ success: true });
+                                    } catch (err) {
                                         console.error(err);
-                                        res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                                        res?.status(500).json({ success: false, reason: 'Error occured' });
                                     }
                                 });
-                            }
-                            catch (err) {
+                            } catch (err) {
                                 console.error(err);
-                                res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                                res?.status(500).json({ success: false, reason: 'Error occured' });
                             }
                         });
-                    }
-                    catch (err) {
+                    } catch (err) {
                         console.error(err);
-                        res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                        res?.status(500).json({ success: false, reason: 'Error occured' });
                     }
                 });
-            }
-            catch (err) {
+            } catch (err) {
                 console.error(err);
-                res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                res?.status(500).json({ success: false, reason: 'Error occured' });
             }
         });
     } catch (err) {
         console.error(err);
-        res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+        res?.status(500).json({ success: false, reason: 'Error occured' });
     }
 };
 
 const requestToJoin = async (req, res) => {
     const email = req.email;
     const role = req.role;
-    if (role != 'eng') {
-        res?.status(403).json({ 'success': false, 'reason': 'Not an Engineer.' });
+    if (role !== 2044) {
+        res?.status(403).json({ success: false, reason: 'Not an Engineer.' });
     }
-    const orgID = data.orgID;
+    const { orgID } = req.body;
     if (!orgID) {
-        res?.status(400).json({ 'success': false, 'reason': 'Org ID cannot be empty' });
+        res?.status(400).json({ success: false, reason: 'Org ID cannot be empty' });
         return;
     }
     if (!Validator.validate('orgID', orgID)) {
-        res?.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
+        res?.status(400).json({ success: false, reason: 'Invalid orgID format' });
         return;
     }
     Org.requestToJoin(con, res, email, orgID);
@@ -96,7 +92,13 @@ const getOrgs = async (req, res) => {
     Org.getOrgs(con, res);
 };
 
-const getOrgsPublic = async (req, res) => {
+/**
+ * Get a list of all organization names and their descriptions.
+ * Accessible by anyone even without authentication.
+ * @param {*} req 
+ * @param {*} res 
+ */
+const getOrgsPublic = (req, res) => {
     try {
         con.query('SELECT orgName, description FROM org', function (err, result) {
             try {
@@ -109,29 +111,34 @@ const getOrgsPublic = async (req, res) => {
                     };
                     org_desc.push(elem);
                 });
-                res?.status(200).json({ 'success': true, 'orgs': org_desc });
-            }
-            catch (e) {
+                res?.status(200).json({ success: true, 'orgs': org_desc });
+            } catch (e) {
                 console.error(e);
-                res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+                res?.status(500).json({ success: false, reason: 'Error occured when retrieving orgs.' });
             }
         });
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e);
-        res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+        res?.status(500).json({ success: false, reason: 'Error occured when retrieving orgs.' });
     }
 };
 
-const getOrgSessionsPublic = async (req, res) => {
+
+/**
+ * Get a list of all session names and dates of an organization.
+ * Accessible by anyone even without authentication.
+ * @param {*} req 
+ * @param {*} res 
+ */
+const getOrgSessionsPublic = (req, res) => {
     try {
         const { orgName } = req.query;
         if (!orgName) {
-            res?.status(400).json({ 'success': false, 'reason': 'Org name cannot be empty' });
+            res?.status(400).json({ success: false, reason: 'Org name cannot be empty' });
             return;
         }
         if (!Validator.validate('orgName', orgName)) {
-            res?.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
+            res?.status(400).json({ success: false, reason: 'Invalid orgName format' });
             return;
         }
         con.query('SELECT name, date FROM session WHERE org = ?', [orgName], function (err, result) {
@@ -145,22 +152,30 @@ const getOrgSessionsPublic = async (req, res) => {
                     };
                     sessions.push(elem);
                 });
-                res?.status(200).json({ 'success': true, 'sessions': sessions });
-            }
-            catch (e) {
+                res?.status(200).json({ success: true, 'sessions': sessions });
+            } catch (e) {
                 console.error(e);
-                res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving sessions.' });
+                res?.status(500).json({ success: false, reason: 'Error occured' });
             }
         });
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e);
-        res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving sessions.' });
+        res?.status(500).json({ success: false, reason: 'Error occured' });
     }
 };
 
 const getRequests = async (req, res) => {
-    Org.getRequests(con, res, req.body);
+    try {
+        const email = req.email;
+        if (req.role !== 3112) {
+            res?.status(403).json({ success: false, reason: 'Not the SuperAdmin.' });
+            return;
+        }
+        Org.getRequests(con, res, email);
+    } catch (e) {
+        console.error(e);
+        res?.status(500).json({ success: false, reason: 'Error occured' });
+    }
 };
 
 const acceptRequest = async (req, res) => {

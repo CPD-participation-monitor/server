@@ -19,7 +19,7 @@ class User {
             let count = result[0]['count(*)'];
             if (count !== 0) {
                 console.log("Email already used");
-                res?.status(409).json({ 'success': false, 'reason': 'Email already used' });
+                res?.status(409).json({ success: false, reason: 'Email already used' });
                 return;
             }
             const pwHash = bcrypt.hashSync(data.password, 12);
@@ -37,7 +37,7 @@ class User {
 
             con.query("INSERT INTO user (email, password, name, nic, role) VALUES (?, ?, ?, ?, ?)", [data.email, pwHash, data.name, data.nic, roleInt], function (err, result) {
                 if (err) throw err;
-                res?.status(200).json({ 'success': true });
+                res?.status(200).json({ success: true });
             });
         });
     };
@@ -47,18 +47,18 @@ class User {
         const email = data.email;
         const password = data.password;
 
-        con.query("SELECT password, name, role FROM user WHERE email = ?", [email], async function (err, result) {
-
+        con.query('SELECT password, name, role FROM user WHERE email = ?', [email], function (err, result) {
             if (err) throw err;
             if (result.length !== 1) {
-                res?.status(401).json({ 'success': false, 'reason': 'No such user' });
+                res?.status(401).json({ success: false, reason: 'No such user' });
                 return;
             }
+
             const pwHash = result[0]['password'];
             if (bcrypt.compareSync(password, pwHash)) {
                 const name = result[0]['name'];
                 const role = result[0]['role'];
-                const token = jwt.sign({ "email": email }, KEY, {
+                const token = jwt.sign({ email, role }, KEY, {
                     expiresIn: "6h",
                 });
                 const serialized = serialize('access_token', token, {
@@ -69,42 +69,40 @@ class User {
                     path: '/',
                 });
 
-                con.query(`select email, orgID from admin_org where email="${email}";`, function (err, result) {
+                con.query('SELECT email, orgID FROM admin_org WHERE email = ?', [email], (err, result) => {
                     if (err) throw err;
 
-                    let user = { 'name': name, 'role': role, 'email': email };
+                    let user = { name, role, email };
 
                     if (result.length !== 0) {
                         user['orgID'] = result[0].orgID;
                     }
 
                     res?.setHeader('Set-Cookie', serialized);
-                    res?.status(200).json({ 'success': true, 'user': user });
+                    res?.status(200).json({ success: true, 'user': user });
                     return;
                 });
 
                 return;
             }
-            res?.status(401).json({ 'success': false, 'reason': 'Incorrect password' });
+            res?.status(401).json({ success: false, reason: 'Incorrect password' });
         });
     }
 
     static promoteToSuperAdmin(con, res, email) {
         try {
-            con.query("UPDATE user SET role = 3112 WHERE email = ?", [email], function (err, result) {
+            con.query('UPDATE user SET role = 3112 WHERE email = ?', [email], function (err, result) {
                 try {
                     if (err) throw err;
-                    res?.status(200).json({ 'success': true });
-                }
-                catch (err) {
+                    res?.status(200).json({ success: true });
+                } catch (err) {
                     console.error(err);
-                    res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                    res?.status(500).json({ success: false, reason: 'Error occured' });
                 }
             });
-        }
-        catch (err) {
+        } catch (err) {
             console.error(err);
-            res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+            res?.status(500).json({ success: false, reason: 'Error occured' });
         }
     }
 }

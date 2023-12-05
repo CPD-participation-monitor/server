@@ -20,15 +20,14 @@ const issueCertificate = (req, res) => {
                     signer.write(JSON.stringify(certData));
                     signer.end();
                     const signature = signer.sign(private_key, 'base64');
-                    res?.status(200).json({ 'success': true, 'data': certData, signature });
+                    res?.status(200).json({ success: true, 'data': certData, signature });
                 } else {
                     // no data => nothing to sign
-                    res?.status(400).json({ 'success': false, 'reason': 'No data' });
+                    res?.status(400).json({ success: false, reason: 'No data' });
                 }
-            }
-            catch (err) {
+            } catch (err) {
                 console.error(err);
-                res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
+                res?.status(500).json({ success: false, reason: 'Error occured when retrieving orgs.' });
             }
         }
         if (sessions) {
@@ -38,7 +37,7 @@ const issueCertificate = (req, res) => {
         }
     } catch (err) {
         console.error(err);
-        res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+        res?.status(500).json({ success: false, reason: 'Error occured' });
     }
 };
 
@@ -46,16 +45,16 @@ const verifyCertificate = (req, res) => {
     try {
         let { data, signature } = req.body;
         if (!data || !signature) {
-            res?.status(500).status(400).json({ 'success': false, 'reason': 'Invalid request' });
+            res?.status(500).status(400).json({ success: false, reason: 'Invalid request' });
         }
         const verify = crypto.createVerify('sha256');
         verify.write(JSON.stringify(data));
         verify.end();
         const status = verify.verify(public_key, signature, 'base64');
-        res?.status(200).json({ 'success': true, 'valid': status });
+        res?.status(200).json({ success: true, 'valid': status });
     } catch (err) {
         console.error(err);
-        res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+        res?.status(500).json({ success: false, reason: 'Error occured' });
     }
 };
 

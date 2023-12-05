@@ -6,7 +6,6 @@ class Validator {
         password: 40,
         name: 30,
         orgName: 30,
-        orgId: 10,
         nic: 20
     }
 
@@ -16,7 +15,6 @@ class Validator {
         password: /^[\x21-\x7E]{8,40}$/,
         name: /^[A-Za-z\s]{2,30}$/,
         orgName: /^[a-zA-Z0-9\s\{\}\[\]\(\)\@\#\&\!]{1,30}$/,
-        orgId: /^[1-9][0-9]{0,9}$/,
         nic: /^[a-zA-Z0-9]{4,20}$/
     };
 
@@ -45,6 +43,9 @@ class Validator {
      */
     static validate(type, value) {
         try {
+            if (type == 'orgID') {
+                return Number.isInteger(value);
+            }
             if (typeof value !== 'string') return false;
             if (type == 'json') { // json serialized string
                 return this._isJson(value);

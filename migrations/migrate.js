@@ -84,7 +84,7 @@ async function migrate() {
     await db.query('INSERT INTO session (name, org, date) VALUES ("Hello IoT", "SLIOT", "2023-12-14")');
 
     // user_session
-    await db.query("INSERT INTO user_session (email, sessionId, hmac) VALUES ('eng@localhost.com', 1, 'vF4MgqXIR1H1Wrzq1S2ePottJ+vOPm9zErVsPEBBhDg=');");
+    await db.query("INSERT INTO user_session (email, sessionId, hmac) VALUES ('eng@localhost.com', 1, 'RAR3tQJpDsMpbAiepaarmmJ9wTnbcFFUNRcgt4Na9Ks=');");
     process.exit();
 }
 migrate();
