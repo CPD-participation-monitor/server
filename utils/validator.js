@@ -6,6 +6,7 @@ class Validator {
         password: 40,
         name: 30,
         orgName: 30,
+        orgId: 10,
         nic: 20
     }
 
@@ -14,7 +15,8 @@ class Validator {
         email: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
         password: /^[\x21-\x7E]{8,40}$/,
         name: /^[A-Za-z\s]{2,30}$/,
-        orgName: /^([a-zA-Z0-9\s\{\}\[\]\(\)\@\#\&\!]{1,30})$/,
+        orgName: /^[a-zA-Z0-9\s\{\}\[\]\(\)\@\#\&\!]{1,30}$/,
+        orgId: /^[1-9][0-9]{0,9}$/,
         nic: /^[a-zA-Z0-9]{4,20}$/
     };
 

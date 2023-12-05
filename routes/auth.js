@@ -17,6 +17,7 @@ router.all(/.*/, (req, res, next) => {
         const data = jwt.verify(token, KEY);
         if (data.email) {
             req.email = data.email;
+            req.role = data.role;
             next();
         } else {
             res.sendStatus(401);

@@ -1,44 +1,6 @@
 class Org {
-    constructor(con, res, data) {
+    constructor(data) {
         this.data = data;
-        this.create(con, res);
-    }
-
-    create(con, res) {
-        try {
-            let data = this.data;
-
-            con.query("select count(*) from org where orgName = ?", [data.orgName], async function (err, result) {
-                try {
-                    if (err) throw err;
-                    let count = result[0]['count(*)'];
-                    if (count !== 0) {
-                        console.log("Org already exists");
-                        res?.status(409).json({ 'success': false, 'reason': 'Org already exists' });
-                        return;
-                    }
-
-                    con.query("INSERT INTO org (orgName, email) VALUES (?, ?)", [data.orgName, data.email], function (err, result) {
-                        try {
-                            if (err) throw err;
-                            res.status(200).json({ 'success': true });
-                        }
-                        catch (err) {
-                            console.error(err);
-                            res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
-                        }
-                    });
-                }
-                catch (err) {
-                    console.error(err);
-                    res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
-                }
-            });
-        }
-        catch (err) {
-            console.error(err);
-            res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving orgs.' });
-        }
     }
 
     static getOrgs(con, res) {
@@ -67,7 +29,7 @@ class Org {
                                 });
                             }
 
-                            res.status(200).json({ 'success': true, 'orgs': returnOrgs });
+                            res?.status(200).json({ 'success': true, 'orgs': returnOrgs });
                         }
                         catch (err) {
                             console.error(err);
@@ -87,27 +49,32 @@ class Org {
         }
     }
 
-    static requestToJoin(con, res, data) {
+    static requestToJoin(con, res, email, orgID) {
+        try {
+            con.query('SELECT email FROM request WHERE email = ? and orgID = ? LIMIT 1', [email, orgID], function (err, result) {
+                try {
+                    if (err) throw err;
 
-        const orgID = data.orgID;
-        const email = data.email;
+                    if (result.length !== 0) {
+                        res?.status(409).json({ 'success': false, 'reason': 'Request already exists' });
+                        return;
+                    }
 
-        con.query(`select * from request where email = "${email}" and orgID = ${orgID};`, function (err, result) {
-            if (err) throw err;
+                    con.query('INSERT INTO request (orgID, email) VALUES (?, ?)', [orgID, email], function (err, result) {
+                        if (err) throw err;
 
-            if (result.length !== 0) {
-                res.status(409).json({ 'success': false, 'reason': 'Request already exists' });
-                return;
-            }
-
-            con.query(`insert into request values (${orgID}, "${email}");`, function (err, result) {
-                if (err) throw err;
-
-                res?.status(200).json({ 'success': true });
-                return;
+                        res?.status(200).json({ 'success': true });
+                        return;
+                    });
+                } catch (err) {
+                    console.error(err);
+                    res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                }
             });
-        });
-
+        } catch (err) {
+            console.error(err);
+            res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+        }
     }
 
     static getRequests(con, res, data) {
@@ -118,7 +85,7 @@ class Org {
             if (err) throw err;
 
             if (result[0].role !== 3112) {
-                res.status(403).json({ 'success': false, 'reason': 'Unauthorized' });
+                res?.status(403).json({ 'success': false, 'reason': 'Not the SuperAdmin.' });
                 return;
             }
 
@@ -134,7 +101,7 @@ class Org {
                     });
                 });
 
-                res.status(200).json({ 'success': true, 'requests': requests });
+                res?.status(200).json({ 'success': true, 'requests': requests });
                 return;
             });
         });
@@ -154,14 +121,14 @@ class Org {
                 if (err) throw err;
 
                 if (result.length !== 0) {
-                    res.status(409).json({ 'success': false, 'reason': 'User is already an admin' });
+                    res?.status(409).json({ 'success': false, 'reason': 'User is already an admin' });
                     return;
                 }
 
                 con.query(`insert into admin_org values ("${email}", ${orgID});`, function (err, result) {
                     if (err) throw err;
 
-                    res.status(200).json({ 'success': true });
+                    res?.status(200).json({ 'success': true });
                     return;
                 });
             });

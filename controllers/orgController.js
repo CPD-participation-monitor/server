@@ -5,35 +5,91 @@ const User = require("../models/user").User;
 
 const createOrg = async (req, res) => {
     try {
-        const { orgName, email, creatorEmail } = req.body;
+        const { orgName, email } = req.body;
+        const creatorEmail = req.email;
         if (!email) {
-            res.status(400).json({ 'success': false, 'reason': 'Email cannot be empty' });
+            res?.status(400).json({ 'success': false, 'reason': 'Email cannot be empty' });
             return;
         }
         if (!Validator.validate('email', email)) {
-            res.status(400).json({ 'success': false, 'reason': 'Invalid email format' });
+            res?.status(400).json({ 'success': false, 'reason': 'Invalid email format' });
             return;
         }
         if (!orgName) {
-            res.status(400).json({ 'success': false, 'reason': 'Org name cannot be empty' });
+            res?.status(400).json({ 'success': false, 'reason': 'Org name cannot be empty' });
             return;
         }
         if (!Validator.validate('orgName', orgName)) {
-            res.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
+            res?.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
             return;
         }
 
-        const org = new Org(con, res, { orgName: orgName, email: email });
-        User.promoteToSuperAdmin(con, res, { email: creatorEmail });
+        con.query('SELECT orgName FROM org WHERE orgName = ? LIMIT 1', [orgName], (err, result) => {
+            try {
+                if (err) throw err;
+                if (result.length !== 0) {
+                    console.log("Org already exists");
+                    res?.status(409).json({ 'success': false, 'reason': 'Org already exists' });
+                    return;
+                }
+                con.query('INSERT INTO org (orgName, email) VALUES (?, ?)', [orgName, email], (err, result2) => {
+                    try {
+                        if (err) throw err;
+                        con.query('INSERT INTO admin_org (email, orgID) VALUES (?, ?)', [creatorEmail, result2.insertId], (err, result) => {
+                            try {
+                                if (err) throw err;
 
+                                // Promote to super admin
+                                con.query('UPDATE user SET role = 3112 WHERE email = ?', [creatorEmail], function (err, result3) {
+                                    try {
+                                        if (err) throw err;
+                                        res?.status(200).json({ 'success': true });
+                                    }
+                                    catch (err) {
+                                        console.error(err);
+                                        res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                                    }
+                                });
+                            }
+                            catch (err) {
+                                console.error(err);
+                                res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                            }
+                        });
+                    }
+                    catch (err) {
+                        console.error(err);
+                        res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                    }
+                });
+            }
+            catch (err) {
+                console.error(err);
+                res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+            }
+        });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ 'success': false, 'reason': 'Error occured' });
+        res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
     }
 };
 
 const requestToJoin = async (req, res) => {
-    Org.requestToJoin(con, res, req.body);
+    const email = req.email;
+    const role = req.role;
+    if (role != 'eng') {
+        res?.status(403).json({ 'success': false, 'reason': 'Not an Engineer.' });
+    }
+    const orgID = data.orgID;
+    if (!orgID) {
+        res?.status(400).json({ 'success': false, 'reason': 'Org ID cannot be empty' });
+        return;
+    }
+    if (!Validator.validate('orgID', orgID)) {
+        res?.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
+        return;
+    }
+    Org.requestToJoin(con, res, email, orgID);
 };
 
 const getOrgs = async (req, res) => {
@@ -53,7 +109,7 @@ const getOrgsPublic = async (req, res) => {
                     };
                     org_desc.push(elem);
                 });
-                res.status(200).json(org_desc);
+                res?.status(200).json({ 'success': true, 'orgs': org_desc });
             }
             catch (e) {
                 console.error(e);
@@ -71,11 +127,11 @@ const getOrgSessionsPublic = async (req, res) => {
     try {
         const { orgName } = req.query;
         if (!orgName) {
-            res.status(400).json({ 'success': false, 'reason': 'Org name cannot be empty' });
+            res?.status(400).json({ 'success': false, 'reason': 'Org name cannot be empty' });
             return;
         }
         if (!Validator.validate('orgName', orgName)) {
-            res.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
+            res?.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
             return;
         }
         con.query('SELECT name, date FROM session WHERE org = ?', [orgName], function (err, result) {
@@ -89,7 +145,7 @@ const getOrgSessionsPublic = async (req, res) => {
                     };
                     sessions.push(elem);
                 });
-                res.status(200).json(sessions);
+                res?.status(200).json({ 'success': true, 'sessions': sessions });
             }
             catch (e) {
                 console.error(e);

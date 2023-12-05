@@ -51,7 +51,7 @@ class User {
 
             if (err) throw err;
             if (result.length !== 1) {
-                res.status(401).json({ 'success': false, 'reason': 'No such user' });
+                res?.status(401).json({ 'success': false, 'reason': 'No such user' });
                 return;
             }
             const pwHash = result[0]['password'];
@@ -78,34 +78,34 @@ class User {
                         user['orgID'] = result[0].orgID;
                     }
 
-                    res.setHeader('Set-Cookie', serialized);
-                    res.status(200).json({ 'success': true, 'user': user });
+                    res?.setHeader('Set-Cookie', serialized);
+                    res?.status(200).json({ 'success': true, 'user': user });
                     return;
                 });
 
                 return;
             }
-            res.status(401).json({ 'success': false, 'reason': 'Incorrect password' });
+            res?.status(401).json({ 'success': false, 'reason': 'Incorrect password' });
         });
     }
 
-    static promoteToSuperAdmin(con, res, data) {
-        const email = data.email;
-
-        con.query("SELECT count(*) FROM user WHERE email = ?", [email], async function (err, result) {
-            if (err) throw err;
-            let count = result[0]['count(*)'];
-            if (count !== 1) {
-                console.log("No such user");
-                res.status(409).json({ 'success': false, 'reason': 'No such user' });
-                return;
-            }
-
+    static promoteToSuperAdmin(con, res, email) {
+        try {
             con.query("UPDATE user SET role = 3112 WHERE email = ?", [email], function (err, result) {
-                if (err) throw err;
-                res.status(200).json({ 'success': true });
+                try {
+                    if (err) throw err;
+                    res?.status(200).json({ 'success': true });
+                }
+                catch (err) {
+                    console.error(err);
+                    res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+                }
             });
-        });
+        }
+        catch (err) {
+            console.error(err);
+            res?.status(500).json({ 'success': false, 'reason': 'Error occured' });
+        }
     }
 }
 
