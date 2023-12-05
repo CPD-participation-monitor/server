@@ -74,8 +74,11 @@ async function migrate() {
     await db.query("INSERT INTO admin_org (email, orgID) VALUES ('orgadmin@sliot3.com', 2);");
 
     // session
-    await db.query("CREATE TABLE IF NOT EXISTS session (sessionId INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) NOT NULL, org VARCHAR(100) NOT NULL, date CHAR(10) NOT NULL, FOREIGN KEY (org) REFERENCES org(orgName));");
-    await db.query("INSERT INTO session (name, org, date) VALUES ('Hello World', 'IESL', '2023-11-04');");
+    await db.query('CREATE TABLE IF NOT EXISTS session (sessionId INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) NOT NULL, org VARCHAR(100) NOT NULL, date CHAR(10) NOT NULL, FOREIGN KEY (org) REFERENCES org(orgName));');
+    await db.query('INSERT INTO session (name, org, date) VALUES ("Hello World", "IESL", "2023-12-09");');
+    await db.query('INSERT INTO session (name, org, date) VALUES ("Engineering", "IESL", "2023-12-11");');
+    await db.query('INSERT INTO session (name, org, date) VALUES ("IoT", "SLIOT", "2023-12-08");');
+    await db.query('INSERT INTO session (name, org, date) VALUES ("Hello IoT", "SLIOT", "2023-12-14");');
 
     // user_session
     await db.query("CREATE TABLE IF NOT EXISTS user_session (email VARCHAR(60) NOT NULL, sessionId INTEGER NOT NULL, hmac VARCHAR(512) NOT NULL, FOREIGN KEY (email) REFERENCES user(email), FOREIGN KEY (sessionId) REFERENCES session(sessionId));");

@@ -15,13 +15,13 @@ const createOrg = async (req, res) => {
             return;
         }
         if (!orgName) {
-            res.status(400).json({ 'success': false, 'reason': 'Name cannot be empty' });
+            res.status(400).json({ 'success': false, 'reason': 'Org name cannot be empty' });
             return;
         }
-        // if (!Validator.validate('name', orgName)) {
-        //     res.status(400).json({ 'success': false, 'reason': 'Invalid name format' });
-        //     return;
-        // }
+        if (!Validator.validate('orgName', orgName)) {
+            res.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
+            return;
+        }
 
         const org = new Org(con, res, { orgName: orgName, email: email });
         User.promoteToSuperAdmin(con, res, { email: creatorEmail });
@@ -67,6 +67,42 @@ const getOrgsPublic = async (req, res) => {
     }
 };
 
+const getOrgSessionsPublic = async (req, res) => {
+    try {
+        const { orgName } = req.query;
+        if (!orgName) {
+            res.status(400).json({ 'success': false, 'reason': 'Org name cannot be empty' });
+            return;
+        }
+        if (!Validator.validate('orgName', orgName)) {
+            res.status(400).json({ 'success': false, 'reason': 'Invalid orgName format' });
+            return;
+        }
+        con.query('SELECT name, date FROM session WHERE org = ?', [orgName], function (err, result) {
+            try {
+                if (err) throw err;
+                let sessions = [];
+                result.forEach(row => {
+                    elem = {
+                        'name': row['name'],
+                        'date': row['date']
+                    };
+                    sessions.push(elem);
+                });
+                res.status(200).json(sessions);
+            }
+            catch (e) {
+                console.error(e);
+                res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving sessions.' });
+            }
+        });
+    }
+    catch (e) {
+        console.error(e);
+        res?.status(500).json({ 'success': false, 'reason': 'Error occured when retrieving sessions.' });
+    }
+};
+
 const getRequests = async (req, res) => {
     Org.getRequests(con, res, req.body);
 };
@@ -75,4 +111,4 @@ const acceptRequest = async (req, res) => {
     Org.acceptRequest(con, res, req.body);
 };
 
-module.exports = { createOrg, getOrgs, requestToJoin, getRequests, acceptRequest, getOrgsPublic };
+module.exports = { createOrg, getOrgs, requestToJoin, getRequests, acceptRequest, getOrgsPublic, getOrgSessionsPublic };
