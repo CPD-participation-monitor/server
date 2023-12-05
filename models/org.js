@@ -9,7 +9,7 @@ class Org {
                 try {
                     if (err) throw err;
 
-                    con.query('SELECT orgID, count(*) from admin_org group by (orgID)', (err, result2) => {
+                    con.query('SELECT orgID, count(*) from user_org group by (orgID)', (err, result2) => {
                         try {
                             if (err) throw err;
 
@@ -58,10 +58,15 @@ class Org {
                     }
 
                     con.query('INSERT INTO request (orgID, email) VALUES (?, ?)', [orgID, email], function (err, result) {
-                        if (err) throw err;
+                        try {
+                            if (err) throw err;
 
-                        res?.status(200).json({ success: true });
-                        return;
+                            res?.status(200).json({ success: true });
+                            return;
+                        } catch (err) {
+                            console.error(err);
+                            res?.status(500).json({ success: false, reason: 'Error occured' });
+                        }
                     });
                 } catch (err) {
                     console.error(err);
@@ -74,14 +79,13 @@ class Org {
         }
     }
 
-    static getRequests(con, res, email) {
+    static getRequests(con, res, orgID) {
         try {
-            con.query('SELECT * FROM request WHERE orgID IN (SELECT orgID FROM admin_org WHERE email = ?)', [email], (err, result) => {
+            con.query('SELECT * FROM request WHERE orgID = ?', [orgID], (err, result) => {
                 try {
                     if (err) throw err;
 
                     let requests = [];
-
                     result.forEach(row => {
                         requests.push(row.email);
                     });
@@ -98,24 +102,20 @@ class Org {
         }
     }
 
-    static acceptRequest(con, res, data) {
-
-        const orgID = data.orgID;
-        const email = data.email;
-
-        con.query(`delete from request where email = "${email}" and orgID = ${orgID};`, function (err, result) {
+    static acceptRequest(con, res, orgID, email) {
+        con.query('DELETE FROM request WHERE email = ? and orgID = ?', [email, orgID], (err, result) => {
             if (err) throw err;
 
-            // check if user is already an admin
-            con.query(`select * from admin_org where email = "${email}"`, function (err, result) {
+            // check if user is already a member
+            con.query('SELECT * FROM user_org WHERE email = ? AND orgID = ? LIMIT 1', [email, orgID], (err, result) => {
                 if (err) throw err;
 
                 if (result.length !== 0) {
-                    res?.status(409).json({ success: false, reason: 'User is already an admin' });
+                    res?.status(409).json({ success: false, reason: 'User is already a member' });
                     return;
                 }
 
-                con.query(`insert into admin_org values ("${email}", ${orgID});`, function (err, result) {
+                con.query('INSERT INTO user_org (email, orgID) VALUES (?, ?)', [email, orgID], (err, result) => {
                     if (err) throw err;
 
                     res?.status(200).json({ success: true });

@@ -18,6 +18,7 @@ router.all(/.*/, (req, res, next) => {
         if (data.email) {
             req.email = data.email;
             req.role = data.role;
+            if (data.orgID) req.orgID = data.orgID;
             next();
         } else {
             res.sendStatus(401);

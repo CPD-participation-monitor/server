@@ -48,44 +48,52 @@ class User {
         const password = data.password;
 
         con.query('SELECT password, name, role FROM user WHERE email = ?', [email], function (err, result) {
-            if (err) throw err;
-            if (result.length !== 1) {
-                res?.status(401).json({ success: false, reason: 'No such user' });
-                return;
-            }
-
-            const pwHash = result[0]['password'];
-            if (bcrypt.compareSync(password, pwHash)) {
+            try {
+                if (err) throw err;
+                if (result.length !== 1) {
+                    res?.status(401).json({ success: false, reason: 'No such user' });
+                    return;
+                }
                 const name = result[0]['name'];
                 const role = result[0]['role'];
-                const token = jwt.sign({ email, role }, KEY, {
-                    expiresIn: "6h",
-                });
-                const serialized = serialize('access_token', token, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production',
-                    sameSite: 'strict',
-                    maxAge: 60 * 60 * 6, // 6 hours
-                    path: '/',
-                });
+                const pwHash = result[0]['password'];
+                if (bcrypt.compareSync(password, pwHash)) {
+                    con.query('SELECT email, orgID FROM admin_org WHERE email = ? LIMIT 1', [email], (err, result) => {
+                        try {
+                            if (err) throw err;
+                            const user = { name, role, email };
+                            const jwt_obj = { email, role };
 
-                con.query('SELECT email, orgID FROM admin_org WHERE email = ?', [email], (err, result) => {
-                    if (err) throw err;
+                            if (result.length === 1) {
+                                user['orgID'] = result[0].orgID;
+                                jwt_obj['orgID'] = result[0].orgID;
+                            }
 
-                    let user = { name, role, email };
+                            const token = jwt.sign(jwt_obj, KEY, {
+                                expiresIn: "6h",
+                            });
 
-                    if (result.length !== 0) {
-                        user['orgID'] = result[0].orgID;
-                    }
-
-                    res?.setHeader('Set-Cookie', serialized);
-                    res?.status(200).json({ success: true, 'user': user });
+                            res?.setHeader('Set-Cookie', serialize('access_token', token, {
+                                httpOnly: true,
+                                secure: process.env.NODE_ENV === 'production',
+                                sameSite: 'strict',
+                                maxAge: 60 * 60 * 6, // 6 hours
+                                path: '/',
+                            }));
+                            res?.status(200).json({ success: true, 'user': user });
+                            return;
+                        } catch (err) {
+                            console.error(err);
+                            res?.status(500).json({ success: false, reason: 'Error occured' });
+                        }
+                    });
                     return;
-                });
-
-                return;
+                }
+                res?.status(401).json({ success: false, reason: 'Incorrect password' });
+            } catch (err) {
+                console.error(err);
+                res?.status(500).json({ success: false, reason: 'Error occured' });
             }
-            res?.status(401).json({ success: false, reason: 'Incorrect password' });
         });
     }
 

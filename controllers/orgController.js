@@ -35,7 +35,7 @@ const createOrg = async (req, res) => {
                 con.query('INSERT INTO org (orgName, email) VALUES (?, ?)', [orgName, email], (err, result2) => {
                     try {
                         if (err) throw err;
-                        con.query('INSERT INTO admin_org (email, orgID) VALUES (?, ?)', [creatorEmail, result2.insertId], (err, result) => {
+                        con.query('INSERT INTO user_org (email, orgID) VALUES (?, ?)', [creatorEmail, result2.insertId], (err, result) => {
                             try {
                                 if (err) throw err;
 
@@ -176,20 +176,53 @@ const getOrgSessionsPublic = (req, res) => {
  */
 const getRequests = async (req, res) => {
     try {
-        const email = req.email;
         if (req.role !== 3112 && req.role !== 6445) {
             res?.status(403).json({ success: false, reason: 'Not an admin' });
             return;
         }
-        Org.getRequests(con, res, email);
+        if (!req.orgID) {
+            res?.status(403).json({ success: false, reason: 'Not an admin of an organization' });
+            return;
+        }
+        Org.getRequests(con, res, req.orgID);
     } catch (e) {
         console.error(e);
         res?.status(500).json({ success: false, reason: 'Error occured' });
     }
 };
 
-const acceptRequest = async (req, res) => {
-    Org.acceptRequest(con, res, req.body);
+/**
+ * Accept a join request for the organization.
+ * Accessible only by org admins and super admins.
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @returns 
+ */
+const acceptRequest = (req, res) => {
+    try {
+        const email = req.body.email;
+        if (!email) {
+            res?.status(400).json({ success: false, reason: 'Email cannot be empty' });
+            return;
+        }
+        if (!Validator.validate('email', email)) {
+            res?.status(400).json({ success: false, reason: 'Invalid email format' });
+            return;
+        }
+        if (req.role !== 3112 && req.role !== 6445) {
+            res?.status(403).json({ success: false, reason: 'Not an admin' });
+            return;
+        }
+        if (!req.orgID) {
+            res?.status(403).json({ success: false, reason: 'Not an admin of an organization' });
+            return;
+        }
+        Org.acceptRequest(con, res, req.orgID, email);
+    } catch (e) {
+        console.error(e);
+        res?.status(500).json({ success: false, reason: 'Error occured' });
+    }
 };
 
 module.exports = { createOrg, getOrgs, requestToJoin, getRequests, acceptRequest, getOrgsPublic, getOrgSessionsPublic };
