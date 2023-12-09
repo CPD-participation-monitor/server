@@ -18,7 +18,7 @@ class Validator {
         nic: /^[a-zA-Z0-9]{4,20}$/
     };
 
-    static _roles = ['eng'];
+    static _roles = ['eng', 'orgAdmin', 'superAdmin', 'systemAdmin'];
 
     /**
      * Check if a string is a valid json encoded object.
