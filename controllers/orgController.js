@@ -101,12 +101,13 @@ const getOrgs = async (req, res) => {
  */
 const getOrgsPublic = (req, res) => {
     try {
-        con.query('SELECT orgName, description FROM org', function (err, result) {
+        con.query('SELECT id, orgName, description FROM org', function (err, result) {
             try {
                 if (err) throw err;
                 let org_desc = [];
                 result.forEach(row => {
                     elem = {
+                        'orgID': row['id'],
                         'orgName': row['orgName'],
                         'description': row['description']
                     };
