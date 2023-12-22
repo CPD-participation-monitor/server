@@ -101,7 +101,7 @@ const getOrgs = async (req, res) => {
  */
 const getOrgsPublic = (req, res) => {
     try {
-        con.query('SELECT id, orgName, description FROM org', function (err, result) {
+        con.query('SELECT org.id, org.orgName, org.email, org.description, count(user_org.email) FROM org LEFT JOIN user_org ON org.id=user_org.orgID GROUP BY (org.id)', function (err, result) {
             try {
                 if (err) throw err;
                 let org_desc = [];
@@ -109,7 +109,9 @@ const getOrgsPublic = (req, res) => {
                     elem = {
                         'orgID': row['id'],
                         'orgName': row['orgName'],
-                        'description': row['description']
+                        'email': row['email'],
+                        'description': row['description'],
+                        'members': row['count(user_org.email)']
                     };
                     org_desc.push(elem);
                 });
